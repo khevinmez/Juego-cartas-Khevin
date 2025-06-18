@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sitio Web Kevin Meza - Juego de Cartas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    .tablero {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .carta {
+      width: 100px;
+      height: 100px;
+      background-color: #3498db;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      user-select: none;
+    }
+
+    .carta.revelada {
+      background-color: #2ecc71;
+    }
+
+    #ganaste {
+      display: none;
+      margin-top: 20px;
+      font-size: 22px;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🃏 Sitio Web Kevin Meza</h1>
+<p>Haz clic en las cartas para encontrar las parejas.</p>
+
+<div class="tablero" id="tablero"></div>
+<div id="ganaste">🎉 ¡Felicidades! Has encontrado todas las parejas.</div>
+
+<script>
+  const emojis = ['🍎', '🍌', '🍒', '🍇', '🍉', '🍍', '🥝', '🍓'];
+  let cartas = [...emojis, ...emojis]; // Duplicamos las cartas para hacer pares
+  cartas = cartas.sort(() => 0.5 - Math.random()); // Mezclamos
+
+  const tablero = document.getElementById('tablero');
+  let cartaSeleccionada = null;
+  let bloqueado = false;
+  let aciertos = 0;
+
+  cartas.forEach((emoji, i) => {
+    const carta = document.createElement('div');
+    carta.classList.add('carta');
+    carta.dataset.valor = emoji;
+    carta.dataset.id = i;
+    carta.innerHTML = '❓';
+
+    carta.addEventListener('click', () => {
+      if (bloqueado || carta.classList.contains('revelada')) return;
+
+      carta.innerHTML = emoji;
+      carta.classList.add('revelada');
+
+      if (!cartaSeleccionada) {
+        cartaSeleccionada = carta;
+      } else {
+        bloqueado = true;
+        setTimeout(() => {
+          if (cartaSeleccionada.dataset.valor === carta.dataset.valor && carta.dataset.id !== cartaSeleccionada.dataset.id) {
+            aciertos++;
+            if (aciertos === emojis.length) {
+              document.getElementById('ganaste').style.display = 'block';
+            }
+          } else {
+            carta.innerHTML = '❓';
+            carta.classList.remove('revelada');
+            cartaSeleccionada.innerHTML = '❓';
+            cartaSeleccionada.classList.remove('revelada');
+          }
+          cartaSeleccionada = null;
+          bloqueado = false;
+        }, 1000);
+      }
+    });
+
+    tablero.appendChild(carta);
+  });
+</script>
+
+</body>
+</html>
